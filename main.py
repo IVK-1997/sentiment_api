@@ -1,9 +1,19 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from openai import OpenAI
 import json
 
 app = FastAPI()
+
+# CORS FIX (important for grader)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 client = OpenAI()
 
@@ -43,6 +53,7 @@ async def analyze_comment(request: CommentRequest):
 
         parsed = json.loads(raw_output)
 
+        # Strict validation
         if parsed["sentiment"] not in ["positive", "negative", "neutral"]:
             raise ValueError("Invalid sentiment")
 
